@@ -41,58 +41,41 @@ namespace TODOList
 
         public void SaveJson()
         {
-            try
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                if (File.Exists(saveFileDialog.FileName))
                 {
-                    if (File.Exists(saveFileDialog.FileName))
-                    {
-                        File.Delete(saveFileDialog.FileName);
-                    }
-                    var result = GridToArray();
-                    using (StreamWriter sw = new StreamWriter(saveFileDialog.FileName))
-                    using (JsonWriter jw = new JsonTextWriter(sw))
-                    {
-                        JsonSerializer js = new JsonSerializer();
-                        js.Formatting = Formatting.Indented;
-                        js.Serialize(jw, result);
-                        MessageBox.Show("Сохранено", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
+                    File.Delete(saveFileDialog.FileName);
                 }
-            }
-            catch (Exception e)
-            {
-                log.Error(e);
+                var result = GridToArray();
+                using (StreamWriter sw = new StreamWriter(saveFileDialog.FileName))
+                using (JsonWriter jw = new JsonTextWriter(sw))
+                {
+                    JsonSerializer js = new JsonSerializer();
+                    js.Formatting = Formatting.Indented;
+                    js.Serialize(jw, result);
+                    MessageBox.Show("Сохранено", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
         }
         public void LoadJson()
         {
-            
-            try
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                gridTaskList.Rows.Clear();
+                using (StreamReader sr = new StreamReader(openFileDialog.FileName))
+                using (JsonReader jr = new JsonTextReader(sr))
                 {
-                    gridTaskList.Rows.Clear();
-                    using (StreamReader sr = new StreamReader(openFileDialog.FileName))
-                    using (JsonReader jr = new JsonTextReader(sr))
+                    JsonSerializer js = new JsonSerializer();
+                    js.Formatting = Formatting.Indented;
+                    var data = js.Deserialize<List<DataSheet>>(jr);
+                    foreach (var item in data)
                     {
-                        JsonSerializer js = new JsonSerializer();
-                        js.Formatting = Formatting.Indented;
-                        var data = js.Deserialize<List<DataSheet>>(jr);
-                        foreach (var item in data)
-                        {
-                            gridTaskList.Rows.Add(item.id, item.task, item.deadline.ToShortDateString(), item.isFinished);
-                        }
-                        Recolor();
+                        gridTaskList.Rows.Add(item.id, item.task, item.deadline.ToShortDateString(), item.isFinished);
                     }
+                    Recolor();
                 }
             }
-            catch (Exception e)
-            {
-                MessageBox.Show("Ошибка","Ошибка", MessageBoxButtons.OK,MessageBoxIcon.Error);
-                log.Error(e);
-            }
-
         }
 
         public void Recolor()
@@ -175,11 +158,27 @@ namespace TODOList
 
         private void сохранитьToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SaveJson();   
+            try
+            {
+                SaveJson();
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show("Не удалось сохранить файл", "Ошибка", MessageBoxButtons.OK,MessageBoxIcon.Error);
+                log.Error(err);
+            }  
         }
        private void открытьToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            LoadJson();
+            try
+            {
+                LoadJson();
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show("Не удалось открыть файл", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                log.Error(err);
+            }
         }
 
         private void toolStripMenuItem3_Click(object sender, EventArgs e)
