@@ -54,7 +54,7 @@ namespace TODOList
                     JsonSerializer js = new JsonSerializer();
                     js.Formatting = Formatting.Indented;
                     js.Serialize(jw, result);
-                    MessageBox.Show("Сохранено", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Сохранение прошло успешно", "Сохранение", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
         }
@@ -142,17 +142,18 @@ namespace TODOList
             }
             if (txtTask.Text == "")
             {
-                MessageBox.Show("Введите текст", "Ошибка",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                MessageBox.Show("Введите наименование задачи", "Внимание",MessageBoxButtons.OK,MessageBoxIcon.Information);
             }
             else if (dateDeadline.Value<DateTime.Parse(DateTime.Today.ToShortDateString()))
             {
-                MessageBox.Show("Дэдлайн меньше текущей даты", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Дэдлайн меньше текущей даты", "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
                 gridTaskList.Rows.Add(i + 1, txtTask.Text, dateDeadline.Value.ToShortDateString(), false);
                 Recolor(i);
                 gridTaskList.ClearSelection();
+                txtTask.Text = "";
             }
         }
 
@@ -166,6 +167,7 @@ namespace TODOList
             {
                 MessageBox.Show("Не удалось сохранить файл", "Ошибка", MessageBoxButtons.OK,MessageBoxIcon.Error);
                 log.Error(err);
+                Dispose();
             }  
         }
        private void открытьToolStripMenuItem_Click(object sender, EventArgs e)
@@ -178,6 +180,7 @@ namespace TODOList
             {
                 MessageBox.Show("Не удалось открыть файл", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 log.Error(err);
+                Dispose();
             }
         }
 
@@ -195,7 +198,7 @@ namespace TODOList
 
         private void очиститьToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("Очистить", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            if (MessageBox.Show("Очистить?", "Очистить?", MessageBoxButtons.YesNo,MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 gridTaskList.Rows.Clear();
             }

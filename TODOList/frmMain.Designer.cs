@@ -224,14 +224,14 @@
             // очиститьToolStripMenuItem
             // 
             this.очиститьToolStripMenuItem.Name = "очиститьToolStripMenuItem";
-            this.очиститьToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.очиститьToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.очиститьToolStripMenuItem.Text = "Очистить";
             this.очиститьToolStripMenuItem.Click += new System.EventHandler(this.очиститьToolStripMenuItem_Click);
             // 
             // удалитьToolStripMenuItem
             // 
             this.удалитьToolStripMenuItem.Name = "удалитьToolStripMenuItem";
-            this.удалитьToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.удалитьToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.удалитьToolStripMenuItem.Text = "Удалить";
             this.удалитьToolStripMenuItem.Click += new System.EventHandler(this.удалитьToolStripMenuItem_Click);
             // 
@@ -294,10 +294,12 @@
             // openFileDialog
             // 
             this.openFileDialog.DefaultExt = "json";
+            this.openFileDialog.Filter = "(*.json)|*.json";
             // 
             // saveFileDialog
             // 
             this.saveFileDialog.DefaultExt = "json";
+            this.saveFileDialog.Filter = "(*.json)|*.json";
             // 
             // printDialog1
             // 

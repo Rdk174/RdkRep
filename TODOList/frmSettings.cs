@@ -149,8 +149,6 @@ namespace TODOList
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            frmMain main = this.Owner as frmMain;
-            main.Recolor();
             Close();
         }
 
