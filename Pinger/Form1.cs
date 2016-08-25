@@ -71,8 +71,8 @@ namespace Pinger
                         JsonSerializer js = new JsonSerializer();
                         js.Formatting = Formatting.Indented;
                         js.Serialize(jw, result);
+                        timerRLabel.Enabled = true;
                         toolStripStatusLabel.Text = "Сохранение прошло успешно";
-                        //System.Threading.Thread.Sleep(200);
                     }
                 }
             }
@@ -89,11 +89,10 @@ namespace Pinger
                     JsonSerializer js = new JsonSerializer();
                     js.Formatting = Formatting.Indented;
                     js.Serialize(jw, result);
+                    timerRLabel.Enabled = true;
                     toolStripStatusLabel.Text="Сохранение прошло успешно";
-                    System.Threading.Thread.Sleep(200);
                 }
             }
-            toolStripStatusLabel.Text = "Готово";
         }
         public void LoadDoc()
         {
@@ -146,6 +145,9 @@ namespace Pinger
                     ipAddressControl1.Text, 
                     picture);
                 isDocChanged = true;
+                txtName.Text = "";
+                txtAdress.Text = "";
+                ipAddressControl1.Text = "0.0.0.0";
             }
         }
 
@@ -232,6 +234,12 @@ namespace Pinger
         {
             isDocChanged = false;
             FilePath = ""; 
+        }
+
+        private void timerRLabel_Tick(object sender, EventArgs e)
+        {
+            toolStripStatusLabel.Text = "Готово";
+            timerRLabel.Enabled=false;
         }
     }
 }
