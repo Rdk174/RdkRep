@@ -32,13 +32,14 @@
             this.ipAddressControl1 = new IPAddressControlLib.IPAddressControl();
             this.gridAddresses = new System.Windows.Forms.DataGridView();
             this.columnIndex = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.columnNamePC = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.columnName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.columnAdress = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.columnIPAdres = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.columnIndicator = new System.Windows.Forms.DataGridViewImageColumn();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItemPing = new System.Windows.Forms.ToolStripMenuItem();
             this.uTMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ultraVNCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.label1 = new System.Windows.Forms.Label();
             this.txtSearch = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -50,11 +51,11 @@
             this.label2 = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.открытьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.новыйСписокToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.открытьToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.сохранитьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
-            this.выходToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.timerRefresh = new System.Windows.Forms.Timer(this.components);
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
@@ -62,7 +63,9 @@
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.timerRLabel = new System.Windows.Forms.Timer(this.components);
-            this.ultraVNCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.button1 = new System.Windows.Forms.Button();
+            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             ((System.ComponentModel.ISupportInitialize)(this.gridAddresses)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -82,8 +85,10 @@
             this.ipAddressControl1.Name = "ipAddressControl1";
             this.ipAddressControl1.ReadOnly = false;
             this.ipAddressControl1.Size = new System.Drawing.Size(101, 20);
-            this.ipAddressControl1.TabIndex = 0;
+            this.ipAddressControl1.TabIndex = 5;
             this.ipAddressControl1.Text = "0.0.0.0";
+            this.ipAddressControl1.Enter += new System.EventHandler(this.ipAddressControl1_Enter);
+            this.ipAddressControl1.Leave += new System.EventHandler(this.ipAddressControl1_Leave);
             // 
             // gridAddresses
             // 
@@ -93,16 +98,21 @@
             this.gridAddresses.AllowUserToResizeRows = false;
             this.gridAddresses.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.columnIndex,
-            this.columnNamePC,
+            this.columnName,
             this.columnAdress,
             this.columnIPAdres,
             this.columnIndicator});
             this.gridAddresses.ContextMenuStrip = this.contextMenuStrip1;
+            this.gridAddresses.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.gridAddresses.Location = new System.Drawing.Point(12, 56);
+            this.gridAddresses.MultiSelect = false;
             this.gridAddresses.Name = "gridAddresses";
             this.gridAddresses.RowHeadersVisible = false;
+            this.gridAddresses.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.gridAddresses.Size = new System.Drawing.Size(508, 395);
             this.gridAddresses.TabIndex = 0;
+            this.gridAddresses.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.gridAddresses_CellClick);
+            this.gridAddresses.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.gridAddresses_CellMouseDown);
             // 
             // columnIndex
             // 
@@ -115,14 +125,14 @@
             this.columnIndex.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.columnIndex.Width = 63;
             // 
-            // columnNamePC
+            // columnName
             // 
-            this.columnNamePC.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this.columnNamePC.Frozen = true;
-            this.columnNamePC.HeaderText = "Наименование";
-            this.columnNamePC.Name = "columnNamePC";
-            this.columnNamePC.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.columnNamePC.Width = 112;
+            this.columnName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.columnName.Frozen = true;
+            this.columnName.HeaderText = "Наименование";
+            this.columnName.Name = "columnName";
+            this.columnName.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.columnName.Width = 112;
             // 
             // columnAdress
             // 
@@ -156,26 +166,35 @@
             // contextMenuStrip1
             // 
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.deleteToolStripMenuItem,
+            this.toolStripMenuItem1,
             this.toolStripMenuItemPing,
             this.uTMToolStripMenuItem,
             this.ultraVNCToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(153, 92);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(127, 98);
             this.contextMenuStrip1.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip1_Opening);
             // 
             // toolStripMenuItemPing
             // 
             this.toolStripMenuItemPing.Name = "toolStripMenuItemPing";
-            this.toolStripMenuItemPing.Size = new System.Drawing.Size(102, 22);
+            this.toolStripMenuItemPing.Size = new System.Drawing.Size(126, 22);
             this.toolStripMenuItemPing.Text = "Пинг";
             this.toolStripMenuItemPing.Click += new System.EventHandler(this.toolStripMenuItemPing_Click);
             // 
             // uTMToolStripMenuItem
             // 
             this.uTMToolStripMenuItem.Name = "uTMToolStripMenuItem";
-            this.uTMToolStripMenuItem.Size = new System.Drawing.Size(102, 22);
+            this.uTMToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.uTMToolStripMenuItem.Text = "UTM";
             this.uTMToolStripMenuItem.Click += new System.EventHandler(this.uTMToolStripMenuItem_Click);
+            // 
+            // ultraVNCToolStripMenuItem
+            // 
+            this.ultraVNCToolStripMenuItem.Name = "ultraVNCToolStripMenuItem";
+            this.ultraVNCToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
+            this.ultraVNCToolStripMenuItem.Text = "Ultra VNC";
+            this.ultraVNCToolStripMenuItem.Click += new System.EventHandler(this.ultraVNCToolStripMenuItem_Click);
             // 
             // label1
             // 
@@ -191,10 +210,13 @@
             this.txtSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.txtSearch.Location = new System.Drawing.Point(54, 30);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(466, 20);
-            this.txtSearch.TabIndex = 3;
-            this.txtSearch.Text = "Введите наименование ресурса или его IP адрес";
+            this.txtSearch.Size = new System.Drawing.Size(385, 20);
+            this.txtSearch.TabIndex = 1;
+            this.txtSearch.Text = "Введите наименование или адрес";
             this.txtSearch.Click += new System.EventHandler(this.txtSearch_Click);
+            this.txtSearch.TextChanged += new System.EventHandler(this.txtSearch_TextChanged);
+            this.txtSearch.Enter += new System.EventHandler(this.txtSearch_Enter);
+            this.txtSearch.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtSearch_KeyPress);
             this.txtSearch.Leave += new System.EventHandler(this.txtSearch_Leave);
             // 
             // groupBox1
@@ -209,7 +231,7 @@
             this.groupBox1.Location = new System.Drawing.Point(12, 457);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(508, 74);
-            this.groupBox1.TabIndex = 4;
+            this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Добавить";
             // 
@@ -218,7 +240,7 @@
             this.btnAdd.Location = new System.Drawing.Point(427, 19);
             this.btnAdd.Name = "btnAdd";
             this.btnAdd.Size = new System.Drawing.Size(75, 49);
-            this.btnAdd.TabIndex = 3;
+            this.btnAdd.TabIndex = 7;
             this.btnAdd.Text = "Добавить";
             this.btnAdd.UseVisualStyleBackColor = true;
             this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
@@ -237,7 +259,9 @@
             this.txtAdress.Location = new System.Drawing.Point(93, 48);
             this.txtAdress.Name = "txtAdress";
             this.txtAdress.Size = new System.Drawing.Size(328, 20);
-            this.txtAdress.TabIndex = 1;
+            this.txtAdress.TabIndex = 6;
+            this.txtAdress.Enter += new System.EventHandler(this.txtAdress_Enter);
+            this.txtAdress.Leave += new System.EventHandler(this.txtAdress_Leave);
             // 
             // label4
             // 
@@ -253,7 +277,9 @@
             this.txtName.Location = new System.Drawing.Point(93, 19);
             this.txtName.Name = "txtName";
             this.txtName.Size = new System.Drawing.Size(153, 20);
-            this.txtName.TabIndex = 1;
+            this.txtName.TabIndex = 4;
+            this.txtName.Enter += new System.EventHandler(this.txtName_Enter);
+            this.txtName.Leave += new System.EventHandler(this.txtName_Leave);
             // 
             // label2
             // 
@@ -277,47 +303,47 @@
             // открытьToolStripMenuItem
             // 
             this.открытьToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.новыйСписокToolStripMenuItem,
-            this.открытьToolStripMenuItem1,
-            this.сохранитьToolStripMenuItem,
+            this.newToolStripMenuItem,
+            this.openToolStripMenuItem1,
+            this.saveToolStripMenuItem,
             this.toolStripMenuItem2,
-            this.выходToolStripMenuItem});
+            this.exitToolStripMenuItem});
             this.открытьToolStripMenuItem.Name = "открытьToolStripMenuItem";
             this.открытьToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this.открытьToolStripMenuItem.Text = "Файл";
             // 
-            // новыйСписокToolStripMenuItem
+            // newToolStripMenuItem
             // 
-            this.новыйСписокToolStripMenuItem.Name = "новыйСписокToolStripMenuItem";
-            this.новыйСписокToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
-            this.новыйСписокToolStripMenuItem.Text = "Новый";
-            this.новыйСписокToolStripMenuItem.Click += new System.EventHandler(this.новыйСписокToolStripMenuItem_Click);
+            this.newToolStripMenuItem.Name = "newToolStripMenuItem";
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.newToolStripMenuItem.Text = "Новый";
+            this.newToolStripMenuItem.Click += new System.EventHandler(this.новыйСписокToolStripMenuItem_Click);
             // 
-            // открытьToolStripMenuItem1
+            // openToolStripMenuItem1
             // 
-            this.открытьToolStripMenuItem1.Name = "открытьToolStripMenuItem1";
-            this.открытьToolStripMenuItem1.Size = new System.Drawing.Size(141, 22);
-            this.открытьToolStripMenuItem1.Text = "Открыть...";
-            this.открытьToolStripMenuItem1.Click += new System.EventHandler(this.открытьToolStripMenuItem1_Click);
+            this.openToolStripMenuItem1.Name = "openToolStripMenuItem1";
+            this.openToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.openToolStripMenuItem1.Text = "Открыть...";
+            this.openToolStripMenuItem1.Click += new System.EventHandler(this.открытьToolStripMenuItem1_Click);
             // 
-            // сохранитьToolStripMenuItem
+            // saveToolStripMenuItem
             // 
-            this.сохранитьToolStripMenuItem.Name = "сохранитьToolStripMenuItem";
-            this.сохранитьToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
-            this.сохранитьToolStripMenuItem.Text = "Сохранить...";
-            this.сохранитьToolStripMenuItem.Click += new System.EventHandler(this.сохранитьToolStripMenuItem_Click);
+            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.saveToolStripMenuItem.Text = "Сохранить...";
+            this.saveToolStripMenuItem.Click += new System.EventHandler(this.сохранитьToolStripMenuItem_Click);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(138, 6);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(149, 6);
             // 
-            // выходToolStripMenuItem
+            // exitToolStripMenuItem
             // 
-            this.выходToolStripMenuItem.Name = "выходToolStripMenuItem";
-            this.выходToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
-            this.выходToolStripMenuItem.Text = "Выход";
-            this.выходToolStripMenuItem.Click += new System.EventHandler(this.выходToolStripMenuItem_Click);
+            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitToolStripMenuItem.Text = "Выход";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.выходToolStripMenuItem_Click);
             // 
             // timerRefresh
             // 
@@ -359,21 +385,37 @@
             // 
             // timerRLabel
             // 
-            this.timerRLabel.Interval = 1000;
+            this.timerRLabel.Interval = 2000;
             this.timerRLabel.Tick += new System.EventHandler(this.timerRLabel_Tick);
             // 
-            // ultraVNCToolStripMenuItem
+            // button1
             // 
-            this.ultraVNCToolStripMenuItem.Name = "ultraVNCToolStripMenuItem";
-            this.ultraVNCToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.ultraVNCToolStripMenuItem.Text = "Ultra VNC";
-            this.ultraVNCToolStripMenuItem.Click += new System.EventHandler(this.ultraVNCToolStripMenuItem_Click);
+            this.button1.Location = new System.Drawing.Point(445, 30);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 20);
+            this.button1.TabIndex = 2;
+            this.button1.Text = "Найти";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // deleteToolStripMenuItem
+            // 
+            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
+            this.deleteToolStripMenuItem.Text = "Удалить";
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(123, 6);
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(531, 559);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.txtSearch);
@@ -413,30 +455,33 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem открытьToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem открытьToolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem сохранитьToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
-        private System.Windows.Forms.ToolStripMenuItem выходToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.Button btnAdd;
         private System.Windows.Forms.TextBox txtAdress;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.SaveFileDialog saveFileDialog;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
-        private System.Windows.Forms.ToolStripMenuItem новыйСписокToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel;
         private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar;
         private System.Windows.Forms.Timer timerRLabel;
-        private System.Windows.Forms.DataGridViewTextBoxColumn columnIndex;
-        private System.Windows.Forms.DataGridViewTextBoxColumn columnNamePC;
-        private System.Windows.Forms.DataGridViewTextBoxColumn columnAdress;
-        private System.Windows.Forms.DataGridViewTextBoxColumn columnIPAdres;
-        private System.Windows.Forms.DataGridViewImageColumn columnIndicator;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemPing;
         public System.Windows.Forms.Timer timerRefresh;
         private System.Windows.Forms.ToolStripMenuItem uTMToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ultraVNCToolStripMenuItem;
+        private System.Windows.Forms.DataGridViewTextBoxColumn columnIndex;
+        private System.Windows.Forms.DataGridViewTextBoxColumn columnName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn columnAdress;
+        private System.Windows.Forms.DataGridViewTextBoxColumn columnIPAdres;
+        private System.Windows.Forms.DataGridViewImageColumn columnIndicator;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
     }
 }
 

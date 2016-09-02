@@ -15,6 +15,7 @@ using Microsoft.Win32;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Linq;
+using System.Data;
 
 namespace Pinger
 {
@@ -30,7 +31,6 @@ namespace Pinger
         public bool isDocChanged { get; set; }
         public Bitmap SetPicture(string IPAdress, int timer)
         {
-            Bitmap pic;
             Ping ping = new Ping();
             PingReply pingReply = ping.Send(IPAdress, timer);
             return pingReply.Status == IPStatus.Success
@@ -44,7 +44,7 @@ namespace Pinger
             {
                 result.Add(new Addresses()
                 {
-                    Id= int.Parse(gridAddresses.Rows[i].Cells[0].Value.ToString()),
+                    Id = int.Parse(gridAddresses.Rows[i].Cells[0].Value.ToString()),
                     Name = gridAddresses.Rows[i].Cells[1].Value.ToString(),
                     Address = gridAddresses.Rows[i].Cells[2].Value.ToString(),
                     IP = gridAddresses.Rows[i].Cells[3].Value.ToString()
@@ -52,81 +52,81 @@ namespace Pinger
             }
             return result;
         }
-        public void SaveDoc()
+        public void SaveDoc(string filePath)
         {
-            if (Properties.Settings.Default.filePath =="")
+            //Properties.Settings.Default.filePath = saveFileDialog.FileName;
+            if (File.Exists(filePath)) File.Delete(filePath);
+            var result = GridToArray();
+            using (StreamWriter sw = new StreamWriter(filePath))
             {
-                if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    Properties.Settings.Default.filePath = saveFileDialog.FileName;
-                    if (File.Exists(saveFileDialog.FileName))
-                    {
-                        File.Delete(saveFileDialog.FileName);
-                    }
-                    var result = GridToArray();
-                    using (StreamWriter sw = new StreamWriter(saveFileDialog.FileName))
-                    {
-                        using (JsonWriter jw = new JsonTextWriter(sw))
-                        {
-                            JsonSerializer js = new JsonSerializer();
-                            js.Formatting = Formatting.Indented;
-                            js.Serialize(jw, result);
-                            timerRLabel.Enabled = true;
-                            toolStripStatusLabel.Text = "Сохранение прошло успешно";
-                        }
-                    }
-                }
-            }
-            else
-            {
-                if (File.Exists(Properties.Settings.Default.filePath))
-                {
-                    File.Delete(Properties.Settings.Default.filePath);
-                }
-                var result = GridToArray();
-                using (StreamWriter sw = new StreamWriter(Properties.Settings.Default.filePath))
-                {
-                    using (JsonWriter jw = new JsonTextWriter(sw))
-                    {
-                        JsonSerializer js = new JsonSerializer();
-                        js.Formatting = Formatting.Indented;
-                        js.Serialize(jw, result);
-                        timerRLabel.Enabled = true;
-                        toolStripStatusLabel.Text = "Сохранение прошло успешно";
-                    }
+                using (JsonWriter jw = new JsonTextWriter(sw))
+                { 
+                    JsonSerializer js = new JsonSerializer();
+                    js.Formatting = Formatting.Indented;
+                    js.Serialize(jw, result);
+                    timerRLabel.Enabled = true;
+                    toolStripStatusLabel.Text = "Сохранение прошло успешно";
                 }
             }
         }
-        public void LoadDoc()
+
+        public void LoadDoc(string filePath)
         {
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            //Properties.Settings.Default.filePath = openFileDialog.FileName;
+            gridAddresses.Rows.Clear();
+            timerRefresh.Enabled = true;
+            using (StreamReader sr = new StreamReader(filePath))
             {
-                Properties.Settings.Default.filePath = openFileDialog.FileName;
-                gridAddresses.Rows.Clear();
-                timerRefresh.Enabled = true;
-                using (StreamReader sr = new StreamReader(openFileDialog.FileName))
+                using (JsonReader jr = new JsonTextReader(sr))
                 {
-                    using (JsonReader jr = new JsonTextReader(sr))
+                    JsonSerializer js = new JsonSerializer();
+                    js.Formatting = Formatting.Indented;
+                    var data = js.Deserialize<List<Addresses>>(jr);
+                    foreach (var item in data)
                     {
-                        JsonSerializer js = new JsonSerializer();
-                        js.Formatting = Formatting.Indented;
-                        var data = js.Deserialize<List<Addresses>>(jr);
-                        foreach (var item in data)
-                        {
-                            var picture = SetPicture(item.IP, 10);
-                            gridAddresses.Rows.Add(item.Id, item.Name, item.Address, item.IP, picture);
-                        }
-                        timerRLabel.Enabled = true;
-                        toolStripStatusLabel.Text = "Документ загружен";
+                        var picture = SetPicture(item.IP, 10);
+                        gridAddresses.Rows.Add(item.Id, item.Name, item.Address, item.IP, picture);
                     }
+                    timerRLabel.Enabled = true;
+                    toolStripStatusLabel.Text = "Документ загружен";
                 }
             }
+        }
+        public int Search(string str)
+        {
+            DataTable dt = new DataTable();
+            BindingSource bns = new BindingSource();
+            foreach (DataGridViewColumn col in gridAddresses.Columns)
+            {
+                dt.Columns.Add(col.Name);
+            }
+
+            foreach (DataGridViewRow row in gridAddresses.Rows)
+            {
+                DataRow dRow = dt.NewRow();
+                foreach (DataGridViewCell cell in row.Cells)
+                {
+                    dRow[cell.ColumnIndex] = cell.Value;
+                }
+                dt.Rows.Add(dRow);
+            }
+            bns.DataSource = dt;
+            //dt.DefaultView.RowFilter = "like '%" + str.Trim() + "%' ";
+            int position = 0;
+            foreach (DataGridViewColumn col in gridAddresses.Columns)
+            {
+                if (bns.Find(col.Name, str) > 0)
+                {
+                    position = bns.Find(col.Name, str);
+                }
+            }
+            return position;
         }
        
         private void txtSearch_Click(object sender, EventArgs e)
         {
-            txtSearch.Text = "";
-            txtSearch.Font = new Font(txtSearch.Font, FontStyle.Regular);
+
+
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
@@ -167,7 +167,7 @@ namespace Pinger
             toolStripProgressBar.Visible = true;
             if (gridAddresses.Rows.Count != 0)
             {
-                toolStripProgressBar.Step = toolStripProgressBar.Maximum/gridAddresses.Rows.Count;
+                toolStripProgressBar.Step = toolStripProgressBar.Maximum / gridAddresses.Rows.Count;
                 foreach (DataGridViewRow item in gridAddresses.Rows)
                 {
                     var picture = SetPicture(gridAddresses.Rows[item.Index].Cells[3].Value.ToString(), 3000);
@@ -184,7 +184,7 @@ namespace Pinger
         {
             try
             {
-                SaveDoc();
+                if (saveFileDialog.ShowDialog() == DialogResult.OK) SaveDoc(saveFileDialog.FileName);
             }
             catch (Exception error)
             {
@@ -197,7 +197,7 @@ namespace Pinger
         {
             try
             {
-                LoadDoc();
+                if (openFileDialog.ShowDialog()==DialogResult.OK) LoadDoc(openFileDialog.FileName);
             }
             catch (Exception error)
             {
@@ -214,7 +214,7 @@ namespace Pinger
                 {
                     if (MessageBox.Show("Сохранить список перед закрытием?", "Сохранить", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
-                        SaveDoc();
+                        if (saveFileDialog.ShowDialog() == DialogResult.OK) SaveDoc(saveFileDialog.FileName);
                         gridAddresses.Rows.Clear();
                     }
                     else
@@ -235,12 +235,20 @@ namespace Pinger
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (gridAddresses.Rows.Count != 0 && isDocChanged)
+            {
+                if (MessageBox.Show("Сохранить список перед закрытием?", "Сохранить", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    if (saveFileDialog.ShowDialog() == DialogResult.OK) SaveDoc(saveFileDialog.FileName);
+                    gridAddresses.Rows.Clear();
+                }
+            }
         }
 
         private void frmMain_Load(object sender, EventArgs e)
         {
             isDocChanged = false;
-            Properties.Settings.Default.filePath = "";
+            LoadDoc(Environment.CurrentDirectory+"\\Планшеты мавт.json");
         }
 
         private void timerRLabel_Tick(object sender, EventArgs e)
@@ -251,8 +259,9 @@ namespace Pinger
 
         private void txtSearch_Leave(object sender, EventArgs e)
         {
-            txtSearch.Text = "Введите наименование ресурса или его IP адресс";
-            txtSearch.Font = new Font(txtSearch.Font, FontStyle.Italic);
+            timerRefresh.Start();
+            //txtSearch.Text = "Введите наименование, адрес или IP адрес";
+            //txtSearch.Font = new Font(txtSearch.Font, FontStyle.Italic);
         }
 
         private void contextMenuStrip1_Opening(object sender, System.ComponentModel.CancelEventArgs e)
@@ -297,6 +306,7 @@ namespace Pinger
         }
         private void ultraVNCToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            timerRefresh.Enabled = false;
             var ip = gridAddresses.Rows[gridAddresses.CurrentRow.Index].Cells[3].Value.ToString();
             Process.Start("C:\\Program Files\\uvnc bvba\\UltraVNC\\vncviewer.exe",ip);
             //var mainHandle = WinAPI.FindWindow(null, "UltraVNC Viewer - 1.2.1.1");
@@ -304,6 +314,86 @@ namespace Pinger
             //var editHandle = WinAPI.FindWindowEx((IntPtr)comboboxHandle, (IntPtr)0, "Edit",null);
             //var ip = gridAdresses.Rows[gridAdresses.CurrentRow.Index].Cells[3].Value.ToString();
             //WinAPI.SendMessage(editHandle, WM_SETTEXT, 1, ip);
+        }
+
+        private void txtSearch_TextChanged(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void txtSearch_Enter(object sender, EventArgs e)
+        {
+            timerRefresh.Stop();
+            txtSearch.Text = "";
+            txtSearch.Font = new Font(txtSearch.Font, FontStyle.Regular);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            gridAddresses.ClearSelection();
+            gridAddresses.Rows[Search(txtSearch.Text)].Selected = true;
+            txtSearch.Text = "Введите наименование или адрес";
+            txtSearch.Font = new Font(txtSearch.Font, FontStyle.Italic);
+
+        }
+
+        private void txtName_Enter(object sender, EventArgs e)
+        {
+            timerRefresh.Enabled = false;
+        }
+
+        private void txtName_Leave(object sender, EventArgs e)
+        {
+            timerRefresh.Enabled = true;
+        }
+
+        private void ipAddressControl1_Enter(object sender, EventArgs e)
+        {
+            timerRefresh.Enabled = false;
+        }
+
+        private void ipAddressControl1_Leave(object sender, EventArgs e)
+        {
+            timerRefresh.Enabled = true;
+        }
+
+        private void txtAdress_Enter(object sender, EventArgs e)
+        {
+            timerRefresh.Enabled = false;
+        }
+
+        private void txtAdress_Leave(object sender, EventArgs e)
+        {
+            timerRefresh.Enabled = true;
+        }
+
+        private void gridAddresses_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void gridAddresses_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+                gridAddresses.Rows[e.RowIndex].Selected = true;
+        }
+
+        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Удалить строку?", "Удалить", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                gridAddresses.Rows.RemoveAt(gridAddresses.CurrentRow.Index);
+                isDocChanged = true;
+                foreach (DataGridViewRow row in gridAddresses.Rows)
+                {
+                    gridAddresses.Rows[row.Index].Cells[0].Value = row.Index + 1;
+                }
+            }
+        }
+
+        private void txtSearch_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter) button1.PerformClick();
         }
     }
 }
