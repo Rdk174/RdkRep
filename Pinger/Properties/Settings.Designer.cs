@@ -34,5 +34,77 @@ namespace Pinger.Properties {
                 this["filePath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AllowAutoUpdate {
+            get {
+                return ((bool)(this["AllowAutoUpdate"]));
+            }
+            set {
+                this["AllowAutoUpdate"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("120000")]
+        public int TimerAutoUpdate {
+            get {
+                return ((int)(this["TimerAutoUpdate"]));
+            }
+            set {
+                this["TimerAutoUpdate"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AllowUltraVNC {
+            get {
+                return ((bool)(this["AllowUltraVNC"]));
+            }
+            set {
+                this["AllowUltraVNC"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("null")]
+        public string PathUltraVNC {
+            get {
+                return ((string)(this["PathUltraVNC"]));
+            }
+            set {
+                this["PathUltraVNC"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AllowPagesiteUTM {
+            get {
+                return ((bool)(this["AllowPagesiteUTM"]));
+            }
+            set {
+                this["AllowPagesiteUTM"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("8080")]
+        public string UTMPort {
+            get {
+                return ((string)(this["UTMPort"]));
+            }
+            set {
+                this["UTMPort"] = value;
+            }
+        }
     }
 }

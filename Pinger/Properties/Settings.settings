@@ -5,5 +5,23 @@
     <Setting Name="filePath" Type="System.String" Scope="User">
       <Value Profile="(Default)">null</Value>
     </Setting>
+    <Setting Name="AllowAutoUpdate" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="TimerAutoUpdate" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">120000</Value>
+    </Setting>
+    <Setting Name="AllowUltraVNC" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="PathUltraVNC" Type="System.String" Scope="User">
+      <Value Profile="(Default)">null</Value>
+    </Setting>
+    <Setting Name="AllowPagesiteUTM" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="UTMPort" Type="System.String" Scope="User">
+      <Value Profile="(Default)">8080</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

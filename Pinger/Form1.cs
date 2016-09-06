@@ -5,17 +5,18 @@ using System.Windows.Forms;
 using System.IO;
 using Newtonsoft.Json;
 using log4net;
-using log4net.Config;
-using System.Drawing.Printing;
-using IPAddressControlLib;
 using System.Net.NetworkInformation;
 using System.Net;
-using System.Management;
-using Microsoft.Win32;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Linq;
 using System.Data;
+using System.Text;
+using HtmlAgilityPack;
+using System.Text.RegularExpressions;
+using Microsoft.Office.Interop.Excel;
+
+using Excell = Microsoft.Office.Interop.Excel.Application;
+using System.Runtime.InteropServices;
 
 namespace Pinger
 {
@@ -24,6 +25,9 @@ namespace Pinger
         private static readonly log4net.ILog log =
         LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         const uint WM_SETTEXT = 0x000C;
+        private Excell application;
+        private Workbook workBook;
+        private Worksheet worksheet;
         public frmMain()
         {
             InitializeComponent();
@@ -47,7 +51,10 @@ namespace Pinger
                     Id = int.Parse(gridAddresses.Rows[i].Cells[0].Value.ToString()),
                     Name = gridAddresses.Rows[i].Cells[1].Value.ToString(),
                     Address = gridAddresses.Rows[i].Cells[2].Value.ToString(),
-                    IP = gridAddresses.Rows[i].Cells[3].Value.ToString()
+                    IP = gridAddresses.Rows[i].Cells[3].Value.ToString(),
+                    UTMVer= gridAddresses.Rows[i].Cells[5].Value.ToString(),
+                    PKI= gridAddresses.Rows[i].Cells[6].Value.ToString(),
+                    Gost= gridAddresses.Rows[i].Cells[7].Value.ToString()
                 });
             }
             return result;
@@ -75,6 +82,9 @@ namespace Pinger
             //Properties.Settings.Default.filePath = openFileDialog.FileName;
             gridAddresses.Rows.Clear();
             timerRefresh.Enabled = true;
+            toolStripStatusLabel.Text = "Идет загрузка файла, пожалуйста подождите";
+            Refresh();
+            toolStripProgressBar.Visible = true;
             using (StreamReader sr = new StreamReader(filePath))
             {
                 using (JsonReader jr = new JsonTextReader(sr))
@@ -82,19 +92,22 @@ namespace Pinger
                     JsonSerializer js = new JsonSerializer();
                     js.Formatting = Formatting.Indented;
                     var data = js.Deserialize<List<Addresses>>(jr);
+                    toolStripProgressBar.Step = toolStripProgressBar.Maximum / data.Count;
                     foreach (var item in data)
                     {
                         var picture = SetPicture(item.IP, 10);
-                        gridAddresses.Rows.Add(item.Id, item.Name, item.Address, item.IP, picture);
+                        gridAddresses.Rows.Add(item.Id, item.Name, item.Address, item.IP, picture,item.UTMVer,item.PKI,item.Gost);
+                        toolStripProgressBar.PerformStep();
                     }
                     timerRLabel.Enabled = true;
-                    toolStripStatusLabel.Text = "Документ загружен";
+                    toolStripProgressBar.Visible = false;
+                    toolStripStatusLabel.Text = "Файл загружен";
                 }
             }
         }
         public int Search(string str)
         {
-            DataTable dt = new DataTable();
+            System.Data.DataTable dt = new System.Data.DataTable();
             BindingSource bns = new BindingSource();
             foreach (DataGridViewColumn col in gridAddresses.Columns)
             {
@@ -122,7 +135,76 @@ namespace Pinger
             }
             return position;
         }
-       
+        public void Recolor()
+        {
+            foreach (DataGridViewRow item in gridAddresses.Rows)
+            {
+                if (item.Index % 2 != 0)
+                {
+                    gridAddresses.Rows[item.Index].DefaultCellStyle.BackColor = Color.LightGray;
+                }
+                else
+                {
+                    gridAddresses.Rows[item.Index].DefaultCellStyle.BackColor = Color.White;
+                }
+            }
+        }
+        public string getRequest(string url)
+        {
+            try
+            {
+                var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+                httpWebRequest.AllowAutoRedirect = false;//Запрещаем автоматический редирект
+                httpWebRequest.Method = "GET"; //Можно не указывать, по умолчанию используется GET.
+                httpWebRequest.Referer = "http://google.com"; // Реферер. Тут можно указать любой URL
+                using (var httpWebResponse = (HttpWebResponse)httpWebRequest.GetResponse())
+                {
+                    using (var stream = httpWebResponse.GetResponseStream())
+                    {
+                        using (var reader = new StreamReader(stream, Encoding.GetEncoding(httpWebResponse.CharacterSet)))
+                        {
+                            return reader.ReadToEnd();
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                return String.Empty;
+            }
+        }
+        public string[] Parser(string url)
+        {
+            HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+            doc.LoadHtml(getRequest(url));
+            string[] result = new string[3];
+            try
+            {
+                HtmlNodeCollection c = doc.DocumentNode.SelectNodes("//div[@class='tab-pane fade in active']/pre");
+                var st = c[0].InnerText.Normalize();
+                string version_template = "[0-9]+.[0-9]+.[0-9]+";
+                string date_template = "[0-9]+-[0-9]+-[0-9]+";
+                var re = new Regex(@version_template);
+                MatchCollection mc = re.Matches(st);
+                result[0] = mc[0].ToString();
+                st = c[c.Count - 2].InnerText.Normalize();
+                re = new Regex(@date_template);
+                mc = re.Matches(st);
+                result[1] = mc[1].ToString();
+                st = c[c.Count - 1].InnerText.Normalize();
+                re = new Regex(@date_template);
+                mc = re.Matches(st);
+                result[2] = mc[1].ToString();
+                return result;
+            }
+            catch(Exception err)
+            {
+                //MessageBox.Show("Не удалось получить данные", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                log.Error(err);
+                result[0] = result[1] = result[2] = "";
+                return result;
+            }
+        }
         private void txtSearch_Click(object sender, EventArgs e)
         {
 
@@ -132,6 +214,7 @@ namespace Pinger
         private void btnAdd_Click(object sender, EventArgs e)
         {
             int i;
+            bool valid=false;
             if (gridAddresses.Rows.Count == 0)
             {
                 i = 0;
@@ -146,37 +229,58 @@ namespace Pinger
             }
             else
             {
-                var picture = SetPicture(ipAddressControl1.Text, 10);
-                gridAddresses.Rows.Add(i+1, 
-                    txtName.Text,
-                    txtAdress.Text, 
-                    ipAddressControl1.Text, 
-                    picture);
-                isDocChanged = true;
-                txtName.Text = "";
-                txtAdress.Text = "";
-                timerRefresh.Enabled = true;
-                ipAddressControl1.Text = "0.0.0.0";
+                foreach (DataGridViewRow item in gridAddresses.Rows)
+                {
+                    if (ipAddressControl1.Text == gridAddresses.Rows[item.Index].Cells[3].Value.ToString())
+                    {
+                        MessageBox.Show("Ресурс с таким IP адрессом уже существует", "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        valid = false;
+                    }
+                    else
+                    {
+                        valid = true;
+                    }
+                }
+                if(valid)
+                {
+                    var picture = SetPicture(ipAddressControl1.Text, 10);
+                    gridAddresses.Rows.Add(i + 1,
+                        txtName.Text,
+                        txtAdress.Text,
+                        ipAddressControl1.Text,
+                        picture);
+                    isDocChanged = true;
+                    txtName.Text = "";
+                    txtAdress.Text = "";
+                    timerRefresh.Enabled = true;
+                    ipAddressControl1.Text = "0.0.0.0";
+                    Recolor();
+                }
             }
         }
 
         private void timerRefresh_Tick(object sender, EventArgs e)
         {
-            toolStripStatusLabel.Text = "Идет обновление данных, пожалуйста подождите";
-            Refresh();
-            toolStripProgressBar.Visible = true;
-            if (gridAddresses.Rows.Count != 0)
+            if (Properties.Settings.Default.AllowAutoUpdate)
             {
-                toolStripProgressBar.Step = toolStripProgressBar.Maximum / gridAddresses.Rows.Count;
-                foreach (DataGridViewRow item in gridAddresses.Rows)
-                {
-                    var picture = SetPicture(gridAddresses.Rows[item.Index].Cells[3].Value.ToString(), 3000);
-                    gridAddresses.Rows[item.Index].Cells[4].Value = picture;
-                    toolStripProgressBar.PerformStep();
-                }
-                toolStripStatusLabel.Text = "Готово";
-                toolStripProgressBar.Visible = false;
+                toolStripStatusLabel.Text = "Идет обновление данных, пожалуйста подождите";
+                Refresh();
+                toolStripProgressBar.Visible = true;
                 toolStripProgressBar.Value = 0;
+                if (gridAddresses.Rows.Count != 0)
+                {
+                    toolStripProgressBar.Step = toolStripProgressBar.Maximum / gridAddresses.Rows.Count;
+                    foreach (DataGridViewRow item in gridAddresses.Rows)
+                    {
+                        toolStripProgressBar.PerformStep();
+                        var picture = SetPicture(gridAddresses.Rows[item.Index].Cells[3].Value.ToString(), 3000);
+                        gridAddresses.Rows[item.Index].Cells[4].Value = picture;
+                        
+                    }
+                    toolStripStatusLabel.Text = "Готово";
+                    toolStripProgressBar.Visible = false;
+                    toolStripProgressBar.Value = 0;
+                }
             }
         }
 
@@ -230,8 +334,33 @@ namespace Pinger
         }
         private void выходToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Application.Exit();
+            System.Windows.Forms.Application.Exit();
         }
+        private void CloseExcel()
+        {
+            if (application != null)
+            {
+                int excelProcessId = -1;
+                WinAPI.GetWindowThreadProcessId(application.Hwnd, ref excelProcessId);
+
+                //Marshal.ReleaseComObject(worksheet);
+                //workBook.Close();
+                //Marshal.ReleaseComObject(workBook);
+                //application.Quit();
+                //Marshal.ReleaseComObject(application);
+
+                application = null;
+                // Прибиваем висящий процесс
+                try
+                {
+                    Process process = Process.GetProcessById(excelProcessId);
+                    process.Kill();
+                }
+                finally { }
+            }
+        }
+
+
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -243,12 +372,20 @@ namespace Pinger
                     gridAddresses.Rows.Clear();
                 }
             }
+            CloseExcel();
         }
 
         private void frmMain_Load(object sender, EventArgs e)
         {
             isDocChanged = false;
-            LoadDoc(Environment.CurrentDirectory+"\\Планшеты мавт.json");
+            timerRefresh.Interval = Properties.Settings.Default.TimerAutoUpdate;
+            if (File.Exists(Environment.CurrentDirectory + "\\Планшеты мавт.json"))
+            {
+                LoadDoc(Environment.CurrentDirectory + "\\Планшеты мавт.json");
+                Recolor();
+            }
+            ultraVNCToolStripMenuItem.Visible = Properties.Settings.Default.AllowUltraVNC;
+                ultraVNCToolStripMenuItem.Enabled = Properties.Settings.Default.AllowUltraVNC;
         }
 
         private void timerRLabel_Tick(object sender, EventArgs e)
@@ -279,36 +416,56 @@ namespace Pinger
 
         private void uTMToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            timerRefresh.Enabled = false;
-            frmUTM f = new frmUTM();
-            f.Owner = this;
-            f.ShowDialog();
-            //string IP = gridAdresses.Rows[gridAdresses.CurrentRow.Index].Cells[3].Value.ToString();
-            //WebRequest request = WebRequest.Create("http://" + IP+ ":8080/");
-            //try
-            //{
-            //    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            //    if (response == null || response.StatusCode != HttpStatusCode.OK)
-            //    {
-            //        MessageBox.Show("УТМ по адресу: " + IP + " не запущен", "УТМ " + IP, MessageBoxButtons.OK, MessageBoxIcon.Information);
-            //    }
-            //    else
-            //    {
-            //        MessageBox.Show("УТМ по адресу: "+IP+" запущен","УТМ "+IP,MessageBoxButtons.OK,MessageBoxIcon.Information);
-            //    }
-            //    response.Close();
-            //}
-            //catch (Exception error)
-            //{
-            //    MessageBox.Show("Не удалось соедениться с указанным узлом", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //    log.Error(error);
-            //}
+            if (Properties.Settings.Default.AllowPagesiteUTM)
+            {
+                timerRefresh.Enabled = false;
+                frmUTM f = new frmUTM();
+                f.Owner = this;
+                f.ShowDialog();
+            }
+            else
+            {
+                string IP = gridAddresses.Rows[gridAddresses.CurrentRow.Index].Cells[3].Value.ToString();
+                WebRequest request = WebRequest.Create("http://" + IP+":" + Properties.Settings.Default.UTMPort+"/");
+                try
+                {
+                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                    if (response == null || response.StatusCode != HttpStatusCode.OK)
+                    {
+                        MessageBox.Show("УТМ по адресу: " + IP+": " + Properties.Settings.Default.UTMPort+" не запущен", "УТМ " + IP, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("УТМ по адресу: " + IP + ": " + Properties.Settings.Default.UTMPort + " запущен", "УТМ " + IP, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    response.Close();
+                }
+                catch (Exception error)
+                {
+                    MessageBox.Show("Не удалось соедениться с указанным узлом", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    log.Error(error);
+                }
+            }
         }
         private void ultraVNCToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            timerRefresh.Enabled = false;
-            var ip = gridAddresses.Rows[gridAddresses.CurrentRow.Index].Cells[3].Value.ToString();
-            Process.Start("C:\\Program Files\\uvnc bvba\\UltraVNC\\vncviewer.exe",ip);
+            if (Properties.Settings.Default.AllowUltraVNC)
+            {
+                timerRefresh.Enabled = false;
+                string path = Properties.Settings.Default.PathUltraVNC;
+                var ip = gridAddresses.Rows[gridAddresses.CurrentRow.Index].Cells[3].Value.ToString();
+                try
+                {
+                    Process.Start(path, ip);
+                }
+                catch (Exception err)
+                {
+                    MessageBox.Show("Не удалось запусть UltraVNC, проверьте правильность пути: " + path + " и повторите попытку",
+                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    log.Error(err);
+                }
+
+            }
             //var mainHandle = WinAPI.FindWindow(null, "UltraVNC Viewer - 1.2.1.1");
             //var comboboxHandle = WinAPI.FindWindowEx((IntPtr)mainHandle, (IntPtr)0, "ComboBox",null);
             //var editHandle = WinAPI.FindWindowEx((IntPtr)comboboxHandle, (IntPtr)0, "Edit",null);
@@ -325,7 +482,7 @@ namespace Pinger
         {
             timerRefresh.Stop();
             txtSearch.Text = "";
-            txtSearch.Font = new Font(txtSearch.Font, FontStyle.Regular);
+            txtSearch.Font = new System.Drawing.Font(txtSearch.Font, FontStyle.Regular);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -333,7 +490,7 @@ namespace Pinger
             gridAddresses.ClearSelection();
             gridAddresses.Rows[Search(txtSearch.Text)].Selected = true;
             txtSearch.Text = "Введите наименование или адрес";
-            txtSearch.Font = new Font(txtSearch.Font, FontStyle.Italic);
+            txtSearch.Font = new System.Drawing.Font(txtSearch.Font, FontStyle.Italic);
 
         }
 
@@ -375,7 +532,10 @@ namespace Pinger
         private void gridAddresses_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
+            {
+                gridAddresses.CurrentCell = gridAddresses[0, e.RowIndex];
                 gridAddresses.Rows[e.RowIndex].Selected = true;
+            }
         }
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
@@ -388,12 +548,135 @@ namespace Pinger
                 {
                     gridAddresses.Rows[row.Index].Cells[0].Value = row.Index + 1;
                 }
+                Recolor();
             }
         }
 
         private void txtSearch_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)Keys.Enter) button1.PerformClick();
+        }
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            timerRefresh.Enabled = false;
+            frmSettings f = new frmSettings();
+            f.Owner = this;
+            f.ShowDialog();
+        }
+
+        private void gridAddresses_UserAddedRow(object sender, DataGridViewRowEventArgs e)
+        {
+          
+        }
+
+        private void gridAddresses_UserDeletedRow(object sender, DataGridViewRowEventArgs e)
+        {
+      
+        }
+
+        private void toolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+            Form2 f = new Form2();
+            f.Owner = this;
+            f.ShowDialog();
+        }
+
+        private void toolStripMenuItem4_Click(object sender, EventArgs e)
+        {
+            var url="http://10.8.0.110:8080/";
+            var result = Parser(url);
+            MessageBox.Show("Версия: " +result[0] + Environment.NewLine + 
+                "PKI: "+ result[1] + Environment.NewLine + 
+                "ГОСТ: "+result[2]);
+        }
+
+        private void получитьСведенияОбUTMToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (gridAddresses.Rows.Count != 0)
+            {
+                isDocChanged = true;
+                timerRefresh.Enabled = false;
+                toolStripStatusLabel.Text = "Идет получение сведений об UTM, пожалуйста подождите";
+                toolStripProgressBar.Value = 0;
+                toolStripProgressBar.Visible = true;
+                toolStripProgressBar.Step = toolStripProgressBar.Maximum/ gridAddresses.Rows.Count;
+                foreach (DataGridViewRow item in gridAddresses.Rows)
+                {
+                    toolStripProgressBar.PerformStep();
+                    var url = "http://" + gridAddresses[3, item.Index].Value.ToString() + ":" + Properties.Settings.Default.UTMPort + "/";
+                    var result = Parser(url);
+                    gridAddresses[5, item.Index].Value = result[0];
+                    gridAddresses[6, item.Index].Value = result[1];
+                    gridAddresses[7, item.Index].Value = result[2];
+                }
+                timerRefresh.Enabled = true;
+                toolStripStatusLabel.Text = "Готово";
+                toolStripProgressBar.Visible = false;
+                toolStripProgressBar.Value = 0;
+            }
+        }
+
+        private void обновитьToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            toolStripStatusLabel.Text = "Идет обновление данных, пожалуйста подождите";
+            Refresh();
+            toolStripProgressBar.Value = 0;
+            toolStripProgressBar.Visible = true;
+            if (gridAddresses.Rows.Count != 0)
+            {
+                toolStripProgressBar.Step = toolStripProgressBar.Maximum / gridAddresses.Rows.Count;
+                foreach (DataGridViewRow item in gridAddresses.Rows)
+                {
+                    toolStripProgressBar.PerformStep();
+                    var picture = SetPicture(gridAddresses.Rows[item.Index].Cells[3].Value.ToString(), 3000);
+                    gridAddresses.Rows[item.Index].Cells[4].Value = picture;
+                }
+                toolStripStatusLabel.Text = "Готово";
+                toolStripProgressBar.Visible = false;
+                toolStripProgressBar.Value = 0;
+            }
+        }
+
+        private void toExcellToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            
+
+            application = new Excell
+            {
+                DisplayAlerts = false
+            };
+           application.Visible = false;
+
+            // Файл шаблона
+            const string template = "template.xltm";
+
+            // Открываем книгу
+            workBook = application.Workbooks.Open(Path.Combine(Environment.CurrentDirectory, template));
+
+            // Получаем активную таблицу
+            worksheet = workBook.ActiveSheet as Worksheet;
+
+            // Записываем данные
+            int rowExcel = 2;
+
+            for (int i = 0; i < gridAddresses.Rows.Count; i++)
+            {
+                worksheet.Cells[rowExcel, "A"] = gridAddresses.Rows[i].Cells[0].Value;
+                worksheet.Cells[rowExcel, "B"] = gridAddresses.Rows[i].Cells[1].Value;
+                worksheet.Cells[rowExcel, "C"] = gridAddresses.Rows[i].Cells[2].Value;
+                worksheet.Cells[rowExcel, "D"] = gridAddresses.Rows[i].Cells[6].Value;
+                worksheet.Cells[rowExcel, "E"] = gridAddresses.Rows[i].Cells[7].Value;
+                ++rowExcel;
+            }
+            application.Run("Format");
+            var range= worksheet.get_Range("A1", "E"+rowExcel);
+            range.EntireColumn.AutoFit();
+            range.EntireRow.AutoFit();
+            // Показываем приложение
+            application.Visible = true;
+            application.UserControl = true;
+            TopMost = false;
         }
     }
 }
