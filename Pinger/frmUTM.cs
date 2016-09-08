@@ -20,8 +20,8 @@ namespace Pinger
         private void frmUTM_Load(object sender, EventArgs e)
         {
             frmMain main = Owner as frmMain;
-            this.Text = "УТМ " + main.gridAddresses.Rows[main.gridAddresses.CurrentRow.Index].Cells[3].Value.ToString()+": " + Properties.Settings.Default.UTMPort;
-            string IP = main.gridAddresses.Rows[main.gridAddresses.CurrentRow.Index].Cells[3].Value.ToString();
+            this.Text = "УТМ " + main.gridAddresses.Rows[main.gridAddresses.CurrentRow.Index].Cells[4].Value.ToString()+": " + Properties.Settings.Default.UTMPort;
+            string IP = main.gridAddresses.Rows[main.gridAddresses.CurrentRow.Index].Cells[4].Value.ToString();
             webBrowser.Navigate(new Uri("http://" + IP + ":" + Properties.Settings.Default.UTMPort + "/"));
         }
     }

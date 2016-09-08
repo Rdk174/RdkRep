@@ -29,16 +29,22 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.ipAddressControl1 = new IPAddressControlLib.IPAddressControl();
             this.gridAddresses = new System.Windows.Forms.DataGridView();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+            this.обновитьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.получитьСведенияОбUTMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItemPing = new System.Windows.Forms.ToolStripMenuItem();
             this.uTMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ultraVNCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.label1 = new System.Windows.Forms.Label();
             this.txtSearch = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.txtOOO = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
             this.btnAdd = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.txtAdress = new System.Windows.Forms.TextBox();
@@ -53,6 +59,7 @@
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toExcellToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.timerRefresh = new System.Windows.Forms.Timer(this.components);
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
@@ -61,10 +68,6 @@
             this.toolStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.timerRLabel = new System.Windows.Forms.Timer(this.components);
             this.button1 = new System.Windows.Forms.Button();
-            this.получитьСведенияОбUTMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.обновитьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItemPing = new System.Windows.Forms.ToolStripMenuItem();
-            this.toExcellToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.columnIndex = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.columnName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.columnOOO = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -74,8 +77,7 @@
             this.columnUTM = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.columnPKI = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.columnGost = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.label5 = new System.Windows.Forms.Label();
+            this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.gridAddresses)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -90,11 +92,11 @@
             this.ipAddressControl1.BackColor = System.Drawing.SystemColors.Window;
             this.ipAddressControl1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.ipAddressControl1.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.ipAddressControl1.Location = new System.Drawing.Point(310, 45);
+            this.ipAddressControl1.Location = new System.Drawing.Point(258, 19);
             this.ipAddressControl1.MinimumSize = new System.Drawing.Size(87, 20);
             this.ipAddressControl1.Name = "ipAddressControl1";
             this.ipAddressControl1.ReadOnly = false;
-            this.ipAddressControl1.Size = new System.Drawing.Size(204, 20);
+            this.ipAddressControl1.Size = new System.Drawing.Size(117, 20);
             this.ipAddressControl1.TabIndex = 5;
             this.ipAddressControl1.Text = "0.0.0.0";
             this.ipAddressControl1.Enter += new System.EventHandler(this.ipAddressControl1_Enter);
@@ -123,7 +125,7 @@
             this.gridAddresses.Name = "gridAddresses";
             this.gridAddresses.RowHeadersVisible = false;
             this.gridAddresses.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridAddresses.Size = new System.Drawing.Size(856, 421);
+            this.gridAddresses.Size = new System.Drawing.Size(873, 421);
             this.gridAddresses.TabIndex = 0;
             this.gridAddresses.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.gridAddresses_CellClick);
             this.gridAddresses.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.gridAddresses_CellMouseDown);
@@ -141,25 +143,46 @@
             this.uTMToolStripMenuItem,
             this.ultraVNCToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(228, 142);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(247, 142);
             this.contextMenuStrip1.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip1_Opening);
             // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(246, 22);
             this.deleteToolStripMenuItem.Text = "Удалить";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(224, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(243, 6);
+            // 
+            // обновитьToolStripMenuItem
+            // 
+            this.обновитьToolStripMenuItem.Name = "обновитьToolStripMenuItem";
+            this.обновитьToolStripMenuItem.Size = new System.Drawing.Size(246, 22);
+            this.обновитьToolStripMenuItem.Text = "Обновить";
+            this.обновитьToolStripMenuItem.Click += new System.EventHandler(this.обновитьToolStripMenuItem_Click);
+            // 
+            // получитьСведенияОбUTMToolStripMenuItem
+            // 
+            this.получитьСведенияОбUTMToolStripMenuItem.Name = "получитьСведенияОбUTMToolStripMenuItem";
+            this.получитьСведенияОбUTMToolStripMenuItem.Size = new System.Drawing.Size(246, 22);
+            this.получитьСведенияОбUTMToolStripMenuItem.Text = "Получить сведения о всех UTM";
+            this.получитьСведенияОбUTMToolStripMenuItem.Click += new System.EventHandler(this.получитьСведенияОбUTMToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItemPing
+            // 
+            this.toolStripMenuItemPing.Name = "toolStripMenuItemPing";
+            this.toolStripMenuItemPing.Size = new System.Drawing.Size(246, 22);
+            this.toolStripMenuItemPing.Text = "Пинг";
+            this.toolStripMenuItemPing.Click += new System.EventHandler(this.toolStripMenuItemPing_Click_1);
             // 
             // uTMToolStripMenuItem
             // 
             this.uTMToolStripMenuItem.Name = "uTMToolStripMenuItem";
-            this.uTMToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
+            this.uTMToolStripMenuItem.Size = new System.Drawing.Size(246, 22);
             this.uTMToolStripMenuItem.Text = "UTM";
             this.uTMToolStripMenuItem.Click += new System.EventHandler(this.uTMToolStripMenuItem_Click);
             // 
@@ -167,7 +190,7 @@
             // 
             this.ultraVNCToolStripMenuItem.Enabled = false;
             this.ultraVNCToolStripMenuItem.Name = "ultraVNCToolStripMenuItem";
-            this.ultraVNCToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
+            this.ultraVNCToolStripMenuItem.Size = new System.Drawing.Size(246, 22);
             this.ultraVNCToolStripMenuItem.Text = "Ultra VNC";
             this.ultraVNCToolStripMenuItem.Visible = false;
             this.ultraVNCToolStripMenuItem.Click += new System.EventHandler(this.ultraVNCToolStripMenuItem_Click);
@@ -186,9 +209,9 @@
             this.txtSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.txtSearch.Location = new System.Drawing.Point(54, 30);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(734, 20);
+            this.txtSearch.Size = new System.Drawing.Size(758, 20);
             this.txtSearch.TabIndex = 1;
-            this.txtSearch.Text = "Введите наименование или адрес";
+            this.txtSearch.Text = "Введите наименование планшета или адрес";
             this.txtSearch.Click += new System.EventHandler(this.txtSearch_Click);
             this.txtSearch.TextChanged += new System.EventHandler(this.txtSearch_TextChanged);
             this.txtSearch.Enter += new System.EventHandler(this.txtSearch_Enter);
@@ -197,7 +220,7 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.textBox1);
+            this.groupBox1.Controls.Add(this.txtOOO);
             this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this.btnAdd);
             this.groupBox1.Controls.Add(this.label3);
@@ -208,17 +231,33 @@
             this.groupBox1.Controls.Add(this.ipAddressControl1);
             this.groupBox1.Location = new System.Drawing.Point(12, 483);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(602, 86);
+            this.groupBox1.Size = new System.Drawing.Size(873, 86);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Добавить";
             // 
+            // txtOOO
+            // 
+            this.txtOOO.Location = new System.Drawing.Point(425, 19);
+            this.txtOOO.Name = "txtOOO";
+            this.txtOOO.Size = new System.Drawing.Size(364, 20);
+            this.txtOOO.TabIndex = 6;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(388, 22);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(31, 13);
+            this.label5.TabIndex = 8;
+            this.label5.Text = "ООО";
+            // 
             // btnAdd
             // 
-            this.btnAdd.Location = new System.Drawing.Point(520, 19);
+            this.btnAdd.Location = new System.Drawing.Point(795, 19);
             this.btnAdd.Name = "btnAdd";
             this.btnAdd.Size = new System.Drawing.Size(70, 46);
-            this.btnAdd.TabIndex = 7;
+            this.btnAdd.TabIndex = 8;
             this.btnAdd.Text = "Добавить";
             this.btnAdd.UseVisualStyleBackColor = true;
             this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
@@ -226,7 +265,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(254, 48);
+            this.label3.Location = new System.Drawing.Point(202, 22);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(50, 13);
             this.label3.TabIndex = 2;
@@ -234,17 +273,17 @@
             // 
             // txtAdress
             // 
-            this.txtAdress.Location = new System.Drawing.Point(310, 19);
+            this.txtAdress.Location = new System.Drawing.Point(64, 45);
             this.txtAdress.Name = "txtAdress";
-            this.txtAdress.Size = new System.Drawing.Size(204, 20);
-            this.txtAdress.TabIndex = 6;
+            this.txtAdress.Size = new System.Drawing.Size(725, 20);
+            this.txtAdress.TabIndex = 7;
             this.txtAdress.Enter += new System.EventHandler(this.txtAdress_Enter);
             this.txtAdress.Leave += new System.EventHandler(this.txtAdress_Leave);
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(254, 22);
+            this.label4.Location = new System.Drawing.Point(20, 48);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(38, 13);
             this.label4.TabIndex = 0;
@@ -254,7 +293,7 @@
             // 
             this.txtName.Location = new System.Drawing.Point(64, 19);
             this.txtName.Name = "txtName";
-            this.txtName.Size = new System.Drawing.Size(173, 20);
+            this.txtName.Size = new System.Drawing.Size(117, 20);
             this.txtName.TabIndex = 4;
             this.txtName.Enter += new System.EventHandler(this.txtName_Enter);
             this.txtName.Leave += new System.EventHandler(this.txtName_Leave);
@@ -276,7 +315,7 @@
             this.toExcellToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(880, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(899, 24);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -335,6 +374,13 @@
             this.settingsToolStripMenuItem.Text = "Настройки";
             this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
             // 
+            // toExcellToolStripMenuItem
+            // 
+            this.toExcellToolStripMenuItem.Name = "toExcellToolStripMenuItem";
+            this.toExcellToolStripMenuItem.Size = new System.Drawing.Size(114, 20);
+            this.toExcellToolStripMenuItem.Text = "Выгрузить в Excel";
+            this.toExcellToolStripMenuItem.Click += new System.EventHandler(this.toExcellToolStripMenuItem_Click);
+            // 
             // timerRefresh
             // 
             this.timerRefresh.Interval = 120000;
@@ -357,7 +403,7 @@
             this.toolStripProgressBar});
             this.statusStrip1.Location = new System.Drawing.Point(0, 572);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(880, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(899, 22);
             this.statusStrip1.TabIndex = 5;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -380,40 +426,13 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(794, 30);
+            this.button1.Location = new System.Drawing.Point(818, 30);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(74, 20);
+            this.button1.Size = new System.Drawing.Size(67, 20);
             this.button1.TabIndex = 2;
             this.button1.Text = "Найти";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // получитьСведенияОбUTMToolStripMenuItem
-            // 
-            this.получитьСведенияОбUTMToolStripMenuItem.Name = "получитьСведенияОбUTMToolStripMenuItem";
-            this.получитьСведенияОбUTMToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
-            this.получитьСведенияОбUTMToolStripMenuItem.Text = "Получить сведения об UTM";
-            this.получитьСведенияОбUTMToolStripMenuItem.Click += new System.EventHandler(this.получитьСведенияОбUTMToolStripMenuItem_Click);
-            // 
-            // обновитьToolStripMenuItem
-            // 
-            this.обновитьToolStripMenuItem.Name = "обновитьToolStripMenuItem";
-            this.обновитьToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
-            this.обновитьToolStripMenuItem.Text = "Обновить";
-            this.обновитьToolStripMenuItem.Click += new System.EventHandler(this.обновитьToolStripMenuItem_Click);
-            // 
-            // toolStripMenuItemPing
-            // 
-            this.toolStripMenuItemPing.Name = "toolStripMenuItemPing";
-            this.toolStripMenuItemPing.Size = new System.Drawing.Size(227, 22);
-            this.toolStripMenuItemPing.Text = "Пинг";
-            // 
-            // toExcellToolStripMenuItem
-            // 
-            this.toExcellToolStripMenuItem.Name = "toExcellToolStripMenuItem";
-            this.toExcellToolStripMenuItem.Size = new System.Drawing.Size(114, 20);
-            this.toExcellToolStripMenuItem.Text = "Выгрузить в Excel";
-            this.toExcellToolStripMenuItem.Click += new System.EventHandler(this.toExcellToolStripMenuItem_Click);
             // 
             // columnIndex
             // 
@@ -474,6 +493,7 @@
             this.columnUTM.HeaderText = "Версия UTM";
             this.columnUTM.Name = "columnUTM";
             this.columnUTM.ReadOnly = true;
+            this.columnUTM.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.columnUTM.Width = 80;
             // 
             // columnPKI
@@ -481,6 +501,7 @@
             this.columnPKI.HeaderText = "PKI серт.";
             this.columnPKI.Name = "columnPKI";
             this.columnPKI.ReadOnly = true;
+            this.columnPKI.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.columnPKI.Width = 80;
             // 
             // columnGost
@@ -488,29 +509,22 @@
             this.columnGost.HeaderText = "ГОСТ серт.";
             this.columnGost.Name = "columnGost";
             this.columnGost.ReadOnly = true;
+            this.columnGost.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.columnGost.Width = 80;
             // 
-            // textBox1
+            // notifyIcon1
             // 
-            this.textBox1.Location = new System.Drawing.Point(64, 45);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(173, 20);
-            this.textBox1.TabIndex = 9;
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(27, 48);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(31, 13);
-            this.label5.TabIndex = 8;
-            this.label5.Text = "ООО";
+            this.notifyIcon1.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon1.Icon")));
+            this.notifyIcon1.Text = "Пингоштука 2016";
+            this.notifyIcon1.Visible = true;
+            this.notifyIcon1.Click += new System.EventHandler(this.notifyIcon1_Click);
+            this.notifyIcon1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseDoubleClick);
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(880, 594);
+            this.ClientSize = new System.Drawing.Size(899, 594);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.groupBox1);
@@ -519,12 +533,13 @@
             this.Controls.Add(this.gridAddresses);
             this.Controls.Add(this.menuStrip1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.MaximizeBox = false;
             this.Name = "frmMain";
-            this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Пингоштука 2016";
+            this.Deactivate += new System.EventHandler(this.frmMain_Deactivate);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMain_FormClosing);
             this.Load += new System.EventHandler(this.frmMain_Load);
             ((System.ComponentModel.ISupportInitialize)(this.gridAddresses)).EndInit();
@@ -578,6 +593,8 @@
         private System.Windows.Forms.ToolStripMenuItem обновитьToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemPing;
         private System.Windows.Forms.ToolStripMenuItem toExcellToolStripMenuItem;
+        private System.Windows.Forms.TextBox txtOOO;
+        private System.Windows.Forms.Label label5;
         private System.Windows.Forms.DataGridViewTextBoxColumn columnIndex;
         private System.Windows.Forms.DataGridViewTextBoxColumn columnName;
         private System.Windows.Forms.DataGridViewTextBoxColumn columnOOO;
@@ -587,8 +604,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn columnUTM;
         private System.Windows.Forms.DataGridViewTextBoxColumn columnPKI;
         private System.Windows.Forms.DataGridViewTextBoxColumn columnGost;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.NotifyIcon notifyIcon1;
     }
 }
 

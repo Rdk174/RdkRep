@@ -2,22 +2,19 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
-namespace Pinger
+namespace converterCSVtoJson
 {
     class Addresses
     {
-        public int Id { get; set; } = 0;
-        public string Name { get; set; } = " ";
-        public string OOO { get; set; } = " ";
-        public string Address { get; set; } = " ";
-        public string IP { get; set; } = " ";
-        public string UTMVer { get; set; } = " ";
-        public string PKI { get; set; } = " ";
-        public string Gost { get; set; } = " ";
-        
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string OOO { get; set; }
+        public string Address { get; set; }
+        public string IP { get; set; }
 
-        public void CSVtoJson(string CSVpath,string jsonPath)
+        public void CSVtoJson(string CSVpath, string jsonPath)
         {
             string[] address = null;
             List<Addresses> result = new List<Addresses>();
@@ -25,9 +22,11 @@ namespace Pinger
             {
                 string line;
                 int i = 0;
-                while ((line = sr.ReadLine())!=null)
+                while ((line = sr.ReadLine()) != null)
                 {
                     i++;
+                    byte[] toBytes = Encoding.UTF8.GetBytes(line);
+                    line= Encoding.UTF8.GetString(toBytes);
                     address = line.Split(';');
                     result.Add(new Addresses()
                     {
